@@ -593,7 +593,7 @@ const size = 1;
 const gap = 0.025;
 
 const textureLoader = new THREE.TextureLoader();
-const ganTexture = textureLoader.load('gan2.png');
+const ganTexture = textureLoader.load('./gan2.png');
 ganTexture.transparent = true;
 
 function build(){
