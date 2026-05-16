@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="style.css">
+    <title>Rubik's cube</title>
+</head>
+<body>
+    <div class="ui">
+
+        <div class="toggle-ui" id="toggle_ui">❯</div>
+
+        <div class="panel top">
+            <input type="text" id="input" placeholder="Exemple : R U R' U'">
+
+            <div class="buttons">
+                <button id="reset">Reset</button>
+                <button id="scramble">Scramble</button>
+                <button id="execute" class="execute-btn">Entrer</button>
+            </div>
+        </div>
+
+        <div class="panel settings">
+
+            <div class="slider-group" id="tps_group">
+                <div class="slider-header">
+                    <span>TPS</span>
+                    <span class="slider-value" id="tps_value">5.5</span>
+                </div>
+
+                <input id="tps_slider" type="range" min="0.1" max="20" step="0.1" value="5.5">
+
+                <div class="slider-header">
+                    <span>Temps estimés</span>
+                    <span class="slider-value" id="tps_time_value">0.0</span>
+                </div>
+            </div>
+
+            <div class="slider-group hidden" id="time_group">
+                <div class="slider-header">
+                    <span>Temps</span>
+                    <span class="slider-value" id="time_value">10.0s</span>
+                </div>
+
+                <input id="time_slider" type="range" min="0.05" max="60" step="0.05" value="10">
+                
+                <div class="slider-header">
+                    <span>TPS estimés</span>
+                    <span class="slider-value" id="time_tps_value">0.0</span>
+                </div>
+            </div>
+
+            <div class="slider-group">
+                <div class="slider-header">
+                    <span>Pause</span>
+                    <span class="slider-value" id="pause_value">0.0s</span>
+                </div>
+
+                <input id="pause_slider" type="range" min="0" max="2" step="0.1" value="0">
+            </div>
+
+        </div>
+
+        <div class="panel">
+            <div class="mode-selector">
+                <div class="mode active" id="mode_tps">TPS</div>
+                <div class="mode" id="mode_time">Temps</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <span id="scramble_moves"></span>
+        </div>
+
+        <div id="player_overlay" class="player-overlay hidden">
+
+            <div class="player-row">
+                <button id="toggle_pause">⏸</button>
+                <button id="next">⏭</button>
+            </div>
+
+            <input id="manual_input" placeholder="R U R' U' (pendant pause)">
+            <button id="tester">Tester</button>
+
+        </div>
+    </div>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
