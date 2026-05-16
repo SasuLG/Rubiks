@@ -30,12 +30,14 @@ const executeBtn = document.querySelector('#execute');
 const playerOverlay = document.querySelector('#player_overlay');
 const togglePauseBtn = document.querySelector('#toggle_pause');
 const nextBtn = document.querySelector('#next');
+const previousBtn = document.querySelector('#previous');
 const manualInput = document.querySelector('#manual_input');
 const TestBtn = document.querySelector('#tester');
 let isPaused = false;
 let next = false;
 let indexMove = 0;
 let saveCubies = [];
+let moveHistory = [];
 
 function showPlayer(){
   playerOverlay.classList.remove("hidden");
@@ -74,6 +76,16 @@ nextBtn.addEventListener("click", () => {
   if(!isPaused) return;
   next = true;
 });
+
+previousBtn.addEventListener("click", () => {
+  if(!isPaused) return;
+  if(indexMove <= 0) return;
+
+  indexMove--;
+  const move = moveHistory[indexMove];
+  executeMove(move.move, -move.amount);
+});
+
 TestBtn.addEventListener("click", () => {
   if(!isPaused) return;
   const moves = parseAlgorithm(manualInput.value);
@@ -198,6 +210,7 @@ async function executeAlgorithm(paused = false){
   if(!paused) showPlayer();
   if(isAnimating) return;
   const moves = parseAlgorithm(paused?manualInput.value:input.value);
+  moveHistory.push(...moves);
   if(!moves.length) return;
   
   const pause = Number(pauseSlider.value) * 1000;
@@ -217,17 +230,16 @@ async function executeAlgorithm(paused = false){
   //   await executeMove(move, amount);
   //   if(pause > 0) await sleep(pause);
   // }
-  for(let i = 0; i < moves.length; i++){//pour plusieurs mouvements en meme temps
+  for(indexMove; indexMove < moves.length; indexMove++){//pour plusieurs mouvements en meme temps
     if(isPaused && !paused){
       saveCubies = saveCubeState();
-      indexMove = i;
     }
     while(isPaused && !paused){
       await sleep(100);
-      if(next) {restoreCubeState(saveCubies);;isPaused = false;}
+      if(next) {;isPaused = false;}
     };
-    const currentMove = moves[i];
-    const nextMove = moves[i + 1];
+    const currentMove = moves[indexMove];
+    const nextMove = moves[indexMove + 1];
     if(nextMove){
 
       if(currentMove.move != "x" && currentMove.move != "y" && currentMove.move != "z" && nextMove.move != "x" && nextMove.move != "y" && nextMove.move != "z"){
@@ -248,7 +260,7 @@ async function executeAlgorithm(paused = false){
           });
 
           await move(moves);
-          i++;
+          indexMove++;
         }else{
           await executeMove(currentMove.move, currentMove.amount);
         }
@@ -259,7 +271,7 @@ async function executeAlgorithm(paused = false){
       await executeMove(currentMove.move, currentMove.amount);
     }
     if(pause > 0) await sleep(pause);//TODO && i%5 === 0
-    if(next) {isPaused = true; next = false;saveCubies = saveCubeState();}
+    if(next) {isPaused = true; next = false;}
   }
   if(!paused){
     hidePlayer();
@@ -440,7 +452,7 @@ function onpointermove(event){
   move({axis: axis, layer: layer, direction: direction});
 }
 
-async function move(movements){////TODO pour x, r, l, f inversé
+async function move(movements){
   if(isAnimating) return;
   isAnimating = true;
   
@@ -448,6 +460,11 @@ async function move(movements){////TODO pour x, r, l, f inversé
   const preparedMoves = movements.map(m =>{
     let correctedDirection = m.direction;
     if(m.axis === "x") correctedDirection *= -1;
+    if(selectedNormal && Math.abs(selectedNormal.x) === 1) {
+      if(m.axis === "z") {
+        correctedDirection *= -1;
+      }
+    }
 
     const totalAngle = (-Math.PI / 2) * correctedDirection;
     const cubes = cubies.filter(cube => {
@@ -644,8 +661,8 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// previous
-// !!!!!!!!!! les updateEstimatedTPS sont bizarres (temps marche pas je crois)
+
+// les updateEstimatedTPS sont bizarres (temps marche pas je crois) + pause 
 
 //scramble : U2 R F L2 F D2 B L2 F2 L2 B U2 F' D2 U B' R2 U2 R F L2
 // x2 y F U L2 D2 U' L U' L' U R' U' R U' F' U F y' U L' U' L U L' U' L U' R U' R' L U' L' U2 R U R' y U' L' U2 L U2 L' U L l' U' L U' L' U L U' L' U2 l U' R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R U2
